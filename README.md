@@ -1,0 +1,1 @@
+Little scripts and various programming exercises playing with Haskell
