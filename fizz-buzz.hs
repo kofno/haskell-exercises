@@ -1,4 +1,5 @@
 -- FizzBuzz impl.
+import Control.Applicative
 
 fizzBuzz :: (Integral a, Show a) => [a] -> [[Char]]
 fizzBuzz xs = [ fizzOrBuzz x | x <- xs ]
@@ -16,7 +17,15 @@ fizzBuzz' = zipWith3 buzzer threes fives [1..]
           threes = cycle ["", "", "Fizz"]
           fives  = cycle ["", "", "", "", "Buzz"]
 
--- Example usages of fizzBuzz'
+-- ... and in the Applicative style
+fizzBuzz'' :: [String]
+fizzBuzz'' = getZipList $ buzzer <$> threes <*> fives <*> ZipList [1..]
+    where buzzer "" "" n = show n
+          buzzer s1 s2 _ = s1 ++ s2
+          threes = ZipList . cycle $ ["", "", "Fizz"]
+          fives  = ZipList . cycle $ ["", "", "", "", "Buzz"]
+
+-- Example usages of fizzBuzz' or fizzBuzz''
 
 -- FizzBuzz one through fifteen
 -- putStrLn . unlines . take 15 $ fizzBuzz'
