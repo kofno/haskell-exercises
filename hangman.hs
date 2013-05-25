@@ -18,18 +18,18 @@ createGame :: Solution -> Hangman
 createGame cs = Hangman cs "" ""
 
 guess :: Hangman -> Char -> Hangman
-guess (Hangman solution hits misses) a
-  | alreadyGuessed a = Hangman solution hits misses
-  | isHit a = Hangman solution (a:hits) misses
-  | otherwise = Hangman solution hits (a:misses)
-  where isHit x = x `elem` solution
-        alreadyGuessed x = x `elem` hits || x `elem` misses 
+guess game@(Hangman solution hits misses) c
+  | alreadyGuessed = game
+  | isHit          = Hangman solution (c:hits) misses
+  | otherwise      = Hangman solution hits (c:misses)
+  where isHit = c `elem` solution
+        alreadyGuessed = c `elem` hits || c `elem` misses 
 
 check :: Hangman -> Result
 check (Hangman cs hs ms)
   | length ms > 5 = Loss "Hanged!"
   | completedWord = Win "Phew! You won"
-  | otherwise = GameOn
+  | otherwise     = GameOn
   where completedWord = cs == [ x | x <- cs, x `elem` hs] 
 
 main :: IO ()
