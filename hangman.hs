@@ -4,8 +4,7 @@ import Data.List
 type Solution = [Char]
 type Guesses = [Char]
 
-data Hangman = Hangman Solution Guesses
-        deriving (Show)
+type  Hangman = (Solution, Guesses)
 
 type Message = String
 data Result = Loss Message
@@ -14,16 +13,16 @@ data Result = Loss Message
             deriving (Show, Eq, Ord)
 
 createGame :: Solution -> Hangman
-createGame cs = Hangman cs ""
+createGame cs = (cs,"")
 
 guess :: Hangman -> Char -> Hangman
-guess game@(Hangman solution guesses) c
+guess game@(solution, guesses) c
   | alreadyGuessed = game
-  | otherwise      = Hangman solution (c:guesses)
+  | otherwise      = (solution, c:guesses)
   where alreadyGuessed = c `elem` guesses
 
 check :: Hangman -> Result
-check (Hangman solution guesses)
+check (solution, guesses)
   | loser         = Loss "Hanged!"
   | completedWord = Win "Phew! You won"
   | otherwise     = GameOn
@@ -53,9 +52,9 @@ gameLoop game = do
     where newGame c = guess game c
 
 maskSolution :: Hangman -> String
-maskSolution (Hangman solution guesses) = intersperse ' ' $ map (mask guesses) solution
+maskSolution (solution, guesses) = intersperse ' ' $ map (mask guesses) solution
   where mask cs c = if c `elem` cs then c else '_'
 
 unusedLetters :: Hangman -> String
-unusedLetters (Hangman _ guesses) = intersperse ' ' $ map (mask guesses) ['a'..'z']
+unusedLetters (_, guesses) = intersperse ' ' $ map (mask guesses) ['a'..'z']
   where mask cs c = if c `elem` cs then ' ' else c
