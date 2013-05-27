@@ -1,11 +1,10 @@
 import System.Console.ANSI
 import Data.List
 
-type Solution = String
-type Hits = String
-type Misses = String
+type Solution = [Char]
+type Guesses = [Char]
 
-data Hangman = Hangman Solution Hits Misses
+data Hangman = Hangman Solution Guesses
         deriving (Show)
 
 type Message = String
@@ -15,22 +14,22 @@ data Result = Loss Message
             deriving (Show, Eq, Ord)
 
 createGame :: Solution -> Hangman
-createGame cs = Hangman cs "" ""
+createGame cs = Hangman cs ""
 
 guess :: Hangman -> Char -> Hangman
-guess game@(Hangman solution hits misses) c
+guess game@(Hangman solution guesses) c
   | alreadyGuessed = game
-  | isHit          = Hangman solution (c:hits) misses
-  | otherwise      = Hangman solution hits (c:misses)
+  | otherwise      = Hangman solution (c:guesses)
   where isHit = c `elem` solution
-        alreadyGuessed = c `elem` hits || c `elem` misses 
+        alreadyGuessed = c `elem` guesses
 
 check :: Hangman -> Result
-check (Hangman cs hs ms)
-  | length ms > 5 = Loss "Hanged!"
+check (Hangman solution guesses)
+  | loser         = Loss "Hanged!"
   | completedWord = Win "Phew! You won"
   | otherwise     = GameOn
-  where completedWord = cs == [ x | x <- cs, x `elem` hs] 
+  where completedWord = solution == [ x | x <- solution, x `elem` guesses] 
+        loser         = length [ x | x <- guesses, x `notElem` solution] > 5
 
 main :: IO ()
 main = gameLoop $ createGame "solution"
@@ -55,9 +54,9 @@ gameLoop game = do
     where newGame c = guess game c
 
 maskSolution :: Hangman -> String
-maskSolution (Hangman cs hits _) = intersperse ' ' $ map (mask hits) cs
+maskSolution (Hangman solution guesses) = intersperse ' ' $ map (mask guesses) solution
   where mask cs c = if c `elem` cs then c else '_'
 
 unusedLetters :: Hangman -> String
-unusedLetters (Hangman _ _ misses) = intersperse ' ' $ map (mask misses) ['a'..'z']
+unusedLetters (Hangman _ guesses) = intersperse ' ' $ map (mask guesses) ['a'..'z']
   where mask cs c = if c `elem` cs then ' ' else c
