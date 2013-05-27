@@ -20,8 +20,7 @@ guess :: Hangman -> Char -> Hangman
 guess game@(Hangman solution guesses) c
   | alreadyGuessed = game
   | otherwise      = Hangman solution (c:guesses)
-  where isHit = c `elem` solution
-        alreadyGuessed = c `elem` guesses
+  where alreadyGuessed = c `elem` guesses
 
 check :: Hangman -> Result
 check (Hangman solution guesses)
