@@ -1,6 +1,6 @@
-import System.Console.ANSI
 import System.Random
 import Data.List
+import Control.Monad.Reader
 
 type Solution = [Char]
 type Guesses = [Char]
@@ -25,7 +25,6 @@ guess game@(solution, guesses) c
 missedGuesses :: Hangman -> Int
 missedGuesses (solution, guesses) = length [ x | x <- guesses
                                                , x `notElem` solution ]
-
 check :: Hangman -> Result
 check game@(solution, guesses)
   | loser         = Loss "Hanged!"
@@ -54,6 +53,9 @@ gameLoop game = do
                                  Win cs  -> putEndGame cs
                                  GameOn  -> gameLoop $ newGame letter
     where newGame c = guess game c
+
+clearScreen :: IO ()
+clearScreen = putStr "\ESC[2J"
 
 putScreen :: Hangman -> IO ()
 putScreen game = do
